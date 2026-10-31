@@ -2672,6 +2672,38 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.import.notion"](): string;
     /**
+      * `Notion API (Experimental)`
+      */
+    ["com.affine.import.notion-api"](): string;
+    /**
+      * `Create an internal integration in Notion (notion.so/profile/integrations), copy its token, and share the pages and databases you want to import with it via "Connections".`
+      */
+    ["com.affine.import.notion-api.instructions"](): string;
+    /**
+      * `Sign in with Notion (OAuth) — coming later.`
+      */
+    ["com.affine.import.notion-api.oauth-placeholder"](): string;
+    /**
+      * `Only content shared with the integration is imported, so the result may be incomplete if something was not shared. This is a one-time snapshot import.`
+      */
+    ["com.affine.import.notion-api.scope-notice"](): string;
+    /**
+      * `Import from Notion API`
+      */
+    ["com.affine.import.notion-api.title"](): string;
+    /**
+      * `Enter a valid integration token (starts with ntn_ or secret_).`
+      */
+    ["com.affine.import.notion-api.token-invalid"](): string;
+    /**
+      * `Integration token`
+      */
+    ["com.affine.import.notion-api.token-placeholder"](): string;
+    /**
+      * `Import content directly from Notion with an integration token, including databases.`
+      */
+    ["com.affine.import.notion-api.tooltip"](): string;
+    /**
       * `Import your Notion data. Supported import formats: HTML with subpages.`
       */
     ["com.affine.import.notion.tooltip"](): string;

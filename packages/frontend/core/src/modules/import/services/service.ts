@@ -22,6 +22,7 @@ import type { OrganizeService } from '../../organize';
 import type { TagService } from '../../tag';
 import type { WorkspaceService } from '../../workspace';
 import { getAFFiNEWorkspaceSchema } from '../../workspace';
+import { runNotionApiImport } from '../notion-api';
 
 const logger = new DebugLogger('import');
 
@@ -85,6 +86,19 @@ export class ImportService extends Service {
       schema: getAFFiNEWorkspaceSchema(),
       imported: snapshot,
       extensions: getStoreManager().config.init().value.get('store'),
+    });
+    return commitService.commitBatch(batch);
+  }
+
+  async importNotionApi(token: string, context?: ImportRunContext) {
+    const commitService = this.createCommitService({
+      organize: true,
+      explorerIcon: true,
+    });
+    const { batch } = await runNotionApiImport({
+      token,
+      signal: context?.signal,
+      onProgress: context?.onProgress,
     });
     return commitService.commitBatch(batch);
   }
