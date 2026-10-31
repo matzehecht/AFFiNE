@@ -1,6 +1,7 @@
 import { dialogHandlers } from './dialog';
 import { diskSyncEvents, diskSyncHandlers } from './disk-sync';
 import { dbEventsV1, dbHandlersV1, nbstoreHandlers } from './nbstore';
+import { notionHandlers } from './notion';
 import { previewHandlers } from './preview';
 import { provideExposed } from './provide';
 import { workspaceEvents, workspaceHandlers } from './workspace';
@@ -12,6 +13,7 @@ export const handlers = {
   workspace: workspaceHandlers,
   dialog: dialogHandlers,
   preview: previewHandlers,
+  notion: notionHandlers,
 };
 
 export const events = {

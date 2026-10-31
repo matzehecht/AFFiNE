@@ -1,7 +1,7 @@
 # Notion API import
 
 Imports content directly from the Notion API (not an export zip) into the current workspace.
-Entry point in the UI: **Import → Notion API (Experimental)**.
+Entry point in the UI: **Import → Notion API (Experimental)**. **Desktop app only** for now (see below).
 
 ## For users
 
@@ -56,8 +56,10 @@ Extension points:
 
 Known limitations:
 
-- `api.notion.com` and Notion's signed file hosts do not send CORS headers. Browser builds need a CORS proxy
-  (`baseUrl`/`fetch` seam) or an environment where requests are not subject to CORS (e.g. desktop with native fetch).
+- `api.notion.com` and Notion's signed file hosts do not send CORS headers, so the importer is desktop-only.
+  All requests go through the Electron helper (`apps/electron/src/helper/notion`, exposed as `apis.notion.fetch`) via
+  `createNativeNotionFetch`. The helper only allows https, never forwards headers to hosts other than `api.notion.com`,
+  and rejects private-network hosts. Web support would need a CORS proxy passed as `baseUrl`/`fetch`.
 - Blobs are held in memory until commit, like the other zip importers.
 - Database fallback columns are plain text, not truly read-only; date ranges keep only the start.
 - Out of scope: sync, incremental re-import, resumable imports, OAuth token exchange.

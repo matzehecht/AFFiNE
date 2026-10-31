@@ -371,6 +371,7 @@ const importConfigs: Record<ImportType, ImportConfig> = {
   },
   notionApi: {
     fileOptions: { acceptType: 'Skip', multiple: false },
+    nativeOnly: true,
     importFunction: async ({ importService, context, notionToken }) => {
       if (!notionToken) {
         throw new Error('A Notion integration token is required');
