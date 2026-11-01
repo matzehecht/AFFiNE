@@ -1,6 +1,7 @@
 import {
   Button,
   IconButton,
+  Input,
   Modal,
   startViewTransition,
 } from '@affine/component';
@@ -16,6 +17,7 @@ import {
   type ImportRunContext,
   ImportService,
 } from '@affine/core/modules/import';
+import { validateNotionToken } from '@affine/core/modules/import/notion-api';
 import { UrlService } from '@affine/core/modules/url';
 import {
   getAFFiNEWorkspaceSchema,
@@ -69,6 +71,7 @@ type ImportType =
   | 'markdown'
   | 'markdownZip'
   | 'notion'
+  | 'notionApi'
   | 'obsidian'
   | 'bear'
   | 'oneNote'
@@ -84,7 +87,7 @@ type AcceptType =
   | 'OneNote'
   | 'Directory'
   | 'Skip'; // Skip is used for dotaffinefile
-type Status = 'idle' | 'importing' | 'success' | 'error';
+type Status = 'idle' | 'notionApiSetup' | 'importing' | 'success' | 'error';
 type ImportErrorState = {
   code: string;
   message: string;
@@ -109,6 +112,7 @@ type ImportFunctionArgs = {
   importAffineFile: () => Promise<WorkspaceMetadata | undefined>;
   importService?: ImportService;
   context: ImportRunContext;
+  notionToken?: string;
 };
 
 function toImportErrorState(error: unknown): ImportErrorState {
@@ -207,6 +211,17 @@ const importOptions = [
     suffixTooltip: 'com.affine.import.notion.tooltip',
     testId: 'editor-option-menu-import-notion',
     type: 'notion' as ImportType,
+  },
+  {
+    key: 'notionApi',
+    label: 'com.affine.import.notion-api',
+    prefixIcon: <NotionIcon color={cssVar('black')} width={20} height={20} />,
+    suffixIcon: (
+      <HelpIcon color={cssVarV2('icon/primary')} width={20} height={20} />
+    ),
+    suffixTooltip: 'com.affine.import.notion-api.tooltip',
+    testId: 'editor-option-menu-import-notion-api',
+    type: 'notionApi' as ImportType,
   },
   {
     key: 'obsidian',
@@ -352,6 +367,19 @@ const importConfigs: Record<ImportType, ImportConfig> = {
         throw new Error('Expected a single zip file for notion import');
       }
       return requireImportService(importService).importNotionZip(file, context);
+    },
+  },
+  notionApi: {
+    fileOptions: { acceptType: 'Skip', multiple: false },
+    nativeOnly: true,
+    importFunction: async ({ importService, context, notionToken }) => {
+      if (!notionToken) {
+        throw new Error('A Notion integration token is required');
+      }
+      return requireImportService(importService).importNotionApi(
+        notionToken,
+        context
+      );
     },
   },
   obsidian: {
@@ -534,6 +562,67 @@ const ImportOptions = ({
   );
 };
 
+const NotionApiSetup = ({
+  onBack,
+  onSubmit,
+}: {
+  onBack: () => void;
+  onSubmit: (token: string) => void;
+}) => {
+  const t = useI18n();
+  const [token, setToken] = useState('');
+  const [touched, setTouched] = useState(false);
+  const invalid = validateNotionToken(token) !== null;
+  return (
+    <>
+      <div className={style.importModalTitle}>
+        {t['com.affine.import.notion-api.title']()}
+      </div>
+      <p className={style.importStatusContent}>
+        {t['com.affine.import.notion-api.instructions']()}
+      </p>
+      <p className={style.importStatusContent}>
+        {t['com.affine.import.notion-api.scope-notice']()}
+      </p>
+      <Input
+        type="password"
+        autoComplete="off"
+        spellCheck={false}
+        value={token}
+        status={touched && invalid ? 'error' : 'default'}
+        placeholder={t['com.affine.import.notion-api.token-placeholder']()}
+        data-testid="import-notion-api-token"
+        onChange={value => {
+          setToken(value);
+          setTouched(true);
+        }}
+        onEnter={() => !invalid && onSubmit(token.trim())}
+      />
+      {touched && invalid ? (
+        <div className={style.importErrorDetail}>
+          {t['com.affine.import.notion-api.token-invalid']()}
+        </div>
+      ) : null}
+      <div className={style.importWarnings}>
+        {t['com.affine.import.notion-api.oauth-placeholder']()}
+      </div>
+      <div className={style.importModalButtonContainer}>
+        <Button onClick={onBack} variant="secondary">
+          {t['com.affine.backButton']()}
+        </Button>
+        <Button
+          onClick={() => onSubmit(token.trim())}
+          variant="primary"
+          disabled={invalid}
+          data-testid="import-notion-api-submit"
+        >
+          {t['Import']()}
+        </Button>
+      </div>
+    </>
+  );
+};
+
 const ImportingStatus = ({
   progress,
   onCancel,
@@ -702,13 +791,17 @@ export const ImportDialog = ({
   }, [globalDialogService]);
 
   const handleImport = useAsyncCallback(
-    async (type: ImportType) => {
+    async (type: ImportType, notionToken?: string) => {
       setImportError(null);
       setImportProgress(null);
       try {
         const importConfig = importConfigs[type];
         if (importConfig.nativeOnly && !BUILD_CONFIG.isElectron) {
           throw new Error(t['com.affine.import.onenote.desktop-only']());
+        }
+        if (type === 'notionApi' && !notionToken) {
+          setStatus('notionApiSetup');
+          return;
         }
         const { acceptType, multiple } = importConfig.fileOptions;
 
@@ -730,7 +823,7 @@ export const ImportDialog = ({
           );
         }
 
-        if (acceptType !== 'Skip') {
+        if (acceptType !== 'Skip' || type === 'notionApi') {
           setStatus('importing');
           track.$.importModal.$.import({
             type,
@@ -752,6 +845,7 @@ export const ImportDialog = ({
           files,
           importAffineFile: handleImportAffineFile,
           importService,
+          notionToken,
           context: {
             signal: abortController.signal,
             onProgress: progress => {
@@ -825,7 +919,13 @@ export const ImportDialog = ({
   }, []);
 
   const statusComponents = {
-    idle: <ImportOptions onImport={handleImport} />,
+    idle: <ImportOptions onImport={type => handleImport(type)} />,
+    notionApiSetup: (
+      <NotionApiSetup
+        onBack={() => setStatus('idle')}
+        onSubmit={token => handleImport('notionApi', token)}
+      />
+    ),
     importing: (
       <ImportingStatus progress={importProgress} onCancel={handleCancel} />
     ),

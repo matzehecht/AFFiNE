@@ -22,6 +22,8 @@ import type { OrganizeService } from '../../organize';
 import type { TagService } from '../../tag';
 import type { WorkspaceService } from '../../workspace';
 import { getAFFiNEWorkspaceSchema } from '../../workspace';
+import { runNotionApiImport } from '../notion-api';
+import { createNativeNotionFetch } from '../notion-api/native-fetch';
 
 const logger = new DebugLogger('import');
 
@@ -85,6 +87,25 @@ export class ImportService extends Service {
       schema: getAFFiNEWorkspaceSchema(),
       imported: snapshot,
       extensions: getStoreManager().config.init().value.get('store'),
+    });
+    return commitService.commitBatch(batch);
+  }
+
+  async importNotionApi(token: string, context?: ImportRunContext) {
+    if (!BUILD_CONFIG.isElectron) {
+      throw new Error(
+        'Notion API import is only available in the desktop app.'
+      );
+    }
+    const commitService = this.createCommitService({
+      organize: true,
+      explorerIcon: true,
+    });
+    const { batch } = await runNotionApiImport({
+      token,
+      fetch: createNativeNotionFetch(),
+      signal: context?.signal,
+      onProgress: context?.onProgress,
     });
     return commitService.commitBatch(batch);
   }

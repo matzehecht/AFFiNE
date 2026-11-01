@@ -35,5 +35,13 @@
   "Default db location hint": "Será guardado por defecto en {{location}}",
   "Delete": "Borrar",
   "Delete Member?": "Borrar Miembro?",
-  "Delete Workspace": "Borrar Espacio de Trabajo"
+  "Delete Workspace": "Borrar Espacio de Trabajo",
+  "com.affine.import.notion-api": "API de Notion (experimental)",
+  "com.affine.import.notion-api.instructions": "Crea una integración interna en Notion (notion.so/profile/integrations), copia su token y comparte con ella las páginas y bases de datos que quieras importar mediante «Conexiones».",
+  "com.affine.import.notion-api.oauth-placeholder": "Iniciar sesión con Notion (OAuth): próximamente.",
+  "com.affine.import.notion-api.scope-notice": "Solo se importa el contenido compartido con la integración, por lo que el resultado puede quedar incompleto si algo no se compartió. Es una importación única (instantánea).",
+  "com.affine.import.notion-api.title": "Importar desde la API de Notion",
+  "com.affine.import.notion-api.token-invalid": "Ingresa un token de integración válido (empieza con ntn_ o secret_).",
+  "com.affine.import.notion-api.token-placeholder": "Token de integración",
+  "com.affine.import.notion-api.tooltip": "Importa contenido directamente desde Notion con un token de integración, incluidas las bases de datos."
 }
