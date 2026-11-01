@@ -795,13 +795,13 @@ export const ImportDialog = ({
       setImportError(null);
       setImportProgress(null);
       try {
-        if (type === 'notionApi' && !notionToken) {
-          setStatus('notionApiSetup');
-          return;
-        }
         const importConfig = importConfigs[type];
         if (importConfig.nativeOnly && !BUILD_CONFIG.isElectron) {
           throw new Error(t['com.affine.import.onenote.desktop-only']());
+        }
+        if (type === 'notionApi' && !notionToken) {
+          setStatus('notionApiSetup');
+          return;
         }
         const { acceptType, multiple } = importConfig.fileOptions;
 
