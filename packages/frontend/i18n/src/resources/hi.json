@@ -21,5 +21,13 @@
   "Back to Quick Search": "त्वरित खोज पर वापस जाएँ",
   "Back to all": "सभी पर वापस जाएँ",
   "Body text": "मुख्य भाग",
-  "Bold": "बोल्ड "
+  "Bold": "बोल्ड ",
+  "com.affine.import.notion-api": "Notion API (प्रायोगिक)",
+  "com.affine.import.notion-api.instructions": "Notion में एक आंतरिक इंटीग्रेशन बनाएँ (notion.so/profile/integrations), उसका टोकन कॉपी करें, और जिन पेजों व डेटाबेस को इम्पोर्ट करना है उन्हें «कनेक्शन» के ज़रिए उसके साथ साझा करें।",
+  "com.affine.import.notion-api.oauth-placeholder": "Notion से साइन इन करें (OAuth) — जल्द आ रहा है।",
+  "com.affine.import.notion-api.scope-notice": "केवल वही सामग्री इम्पोर्ट होती है जो इंटीग्रेशन के साथ साझा की गई है, इसलिए कुछ साझा न होने पर परिणाम अधूरा हो सकता है। यह एक बार का स्नैपशॉट इम्पोर्ट है।",
+  "com.affine.import.notion-api.title": "Notion API से इम्पोर्ट करें",
+  "com.affine.import.notion-api.token-invalid": "मान्य इंटीग्रेशन टोकन दर्ज करें (ntn_ या secret_ से शुरू होता है)।",
+  "com.affine.import.notion-api.token-placeholder": "इंटीग्रेशन टोकन",
+  "com.affine.import.notion-api.tooltip": "इंटीग्रेशन टोकन से डेटाबेस सहित सामग्री सीधे Notion से इम्पोर्ट करें।"
 }
